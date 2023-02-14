@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
+const cors = require('cors');
 
 const NotFoundError = require('./errors/not-found-error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -11,10 +12,11 @@ const auth = require('./middlewares/auth');
 const { validationCreateUser, validationLogin } = require('./middlewares/validation');
 const centralizedHandler = require('./middlewares/centralizedHandler');
 
-const { PORT = 3009, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
+const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 app.use(requestLogger);
 app.post('/signin', validationLogin, login);
 app.post('/signup', validationCreateUser, createUser);
