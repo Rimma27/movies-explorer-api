@@ -15,7 +15,7 @@ const { validationCreateUser, validationLogin } = require('./middlewares/validat
 const centralizedHandler = require('./middlewares/centralizedHandler');
 const limiter = require('./middlewares/rateLimit');
 
-const { PORT = 3002, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
+const { PORT = 3001, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 const app = express();
 app.use(limiter);
 app.use(helmet());
