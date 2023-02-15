@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const cors = require('cors');
+const helmet = require('helmet');
 
 const NotFoundError = require('./errors/not-found-error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -12,10 +13,12 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { validationCreateUser, validationLogin } = require('./middlewares/validation');
 const centralizedHandler = require('./middlewares/centralizedHandler');
+const limiter = require('./middlewares/rateLimit');
 
-const { PORT = 3001, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
+const { PORT = 3002, MONGO_URL = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 const app = express();
-
+app.use(limiter);
+app.use(helmet());
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);

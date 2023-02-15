@@ -13,34 +13,7 @@ module.exports.getMovies = (req, res, next) => {
 };
 
 module.exports.createMovie = (req, res, next) => {
-  const {
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    thumbnail,
-    movieId,
-    nameRU,
-    nameEN,
-  } = req.body;
-  const owner = req.user._id;
-  Movie.create({
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    thumbnail,
-    movieId,
-    nameRU,
-    nameEN,
-    owner,
-  })
+  Movie.create({ ...req.body, owner: req.user._id })
     .then((movie) => res.status(SUCCESS_CODE).send({ movie }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -59,7 +32,7 @@ module.exports.deleteMovie = (req, res, next) => {
       } else if (!movie.owner.equals(req.user._id)) {
         throw new ForbiddenError('Вы не можете удалить фильм');
       } else {
-        movie.remove()
+        return movie.remove()
           .then(() => res.status(SUCCESS_CODE).send({ message: 'Фильм успешно удален' }));
       }
     })
@@ -71,47 +44,3 @@ module.exports.deleteMovie = (req, res, next) => {
       }
     });
 };
-
-// module.exports.likeCard = (req, res, next) => {
-//   Movie.findByIdAndUpdate(
-//     req.params.cardId,
-//     { $addToSet: { likes: req.user._id } },
-//     { new: true },
-//   )
-//     .populate(['owner', 'likes'])
-//     .then((movie) => {
-//       if (!movie) {
-//         throw new NotFoundError('Пользователь по указанному _id не найден');
-//       }
-//       res.status(SUCCESS_CODE).send({ movie });
-//     })
-//     .catch((err) => {
-//       if (err.name === 'CastError') {
-//         next(new BadRequestError('Передан невалидный ID'));
-//       } else {
-//         next(err);
-//       }
-//     });
-// };
-
-// module.exports.dislikeCard = (req, res, next) => {
-//   Movie.findByIdAndUpdate(
-//     req.params.cardId,
-//     { $pull: { likes: req.user._id } },
-//     { new: true },
-//   )
-//     .populate(['owner', 'likes'])
-//     .then((movie) => {
-//       if (!movie) {
-//         throw new NotFoundError('Пользователь по указанному _id не найден');
-//       }
-//       res.status(SUCCESS_CODE).send({ movie });
-//     })
-//     .catch((err) => {
-//       if (err.name === 'CastError') {
-//         next(new BadRequestError('Передан невалидный ID'));
-//       } else {
-//         next(err);
-//       }
-//     });
-// };

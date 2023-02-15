@@ -46,6 +46,8 @@ module.exports.updateUserInfo = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Ошибка валидации полей'));
+      } else if (err.code === MONGO_DUPLICATE_ERROR) {
+        next(new ConflictError('Данный пользователь уже существует'));
       } else {
         next(err);
       }
@@ -56,8 +58,9 @@ module.exports.createUser = async (req, res, next) => {
   const {
     email, password, name,
   } = req.body;
-  const hash = await bcrypt.hash(password, 10);
-  User.create({ ...req.body, password: hash })
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ ...req.body, password: hash }))
     .then(() => res.status(SUCCESS_CODE).send({
       email, name,
     }))
